@@ -32,7 +32,50 @@ class ClientServiceTest {
             clientService.saveClient(client)
         }
         assertEquals(exception.errorCode[0], ErrorCode.INVALID_CHARACTER)
+        assertEquals(exception.errorCode[3], ErrorCode.INVALID_FORMAT)
     }
+
+
+    @Test
+    fun `fail save client - name error` () {
+        val client = getClientFromJson("/fail/user_with_bad_name.json")
+        val exception = assertThrows<ValidationException> ("Недопустимые символы в имени") {
+            clientService.saveClient(client)
+        }
+        assertEquals(exception.errorCode[0], ErrorCode.INVALID_CHARACTER)
+    }
+
+
+    @Test
+    fun `fail save client - email error` () {
+        val client = getClientFromJson("/fail/user_with_bad_email.json")
+        val exception = assertFailsWith<ValidationException> ("Недопустимый формат почты") {
+            clientService.saveClient(client)
+        }
+        assertEquals(exception.errorCode[2], ErrorCode.INVALID_FORMAT)
+    }
+
+    @Test
+    fun `fail save client - snils error` () {
+        val client = getClientFromJson("/fail/user_with_bad_snils.json")
+        val exception = assertFailsWith<ValidationException> ("Недопустимый формат СНИЛС") {
+            clientService.saveClient(client)
+        }
+        assertEquals(exception.errorCode[2], ErrorCode.INVALID_FORMAT)
+    }
+
+
+    @Test
+    fun `fail save client - phone error` () {
+        val client = getClientFromJson("/fail/user_with_bad_phone_length.json")
+        val exception = assertFailsWith<ValidationException> ("Недопустимая длина телефона") {
+            clientService.saveClient(client)
+        }
+        assertEquals(exception.errorCode[3], ErrorCode.INVALID_LENGTH)
+    }
+
+
+
 
     private fun getClientFromJson(fileName: String): Client = this::class.java.getResource(fileName)
         .takeIf { it != null }
